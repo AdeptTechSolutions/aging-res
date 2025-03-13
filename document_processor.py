@@ -102,7 +102,7 @@ class DocumentProcessor:
             ),
             ("text_converter", TextFileToDocument()),
             ("markdown_converter", MarkdownToDocument()),
-            ("pdf_converter", PyMuPDFToDocument()),
+            ("pdf_converter", PyPDFToDocument()),
             ("joiner", DocumentJoiner()),
             ("enricher", MetadataEnricher(metadata_dict=self.metadata_dict)),
             ("cleaner", DocumentCleaner()),
