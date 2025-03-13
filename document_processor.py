@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 from typing import Dict, List, Set
 
@@ -36,11 +37,15 @@ class MetadataEnricher:
             file_path = doc.meta.get("file_path")
             if file_path:
                 filename = Path(file_path).name
-                metadata = self.metadata_dict.get(filename)
-                if metadata:
+                metadata = self.metadata_dict.get(filename, {})
+
+                if "author" in metadata:
                     doc.meta["author"] = metadata["author"]
+                if "title" in metadata:
                     doc.meta["title"] = metadata["title"]
-                    doc.meta["language"] = metadata["language"]
+                if "link" in metadata:
+                    doc.meta["link"] = metadata["link"]
+
         return {"documents": documents}
 
 
@@ -78,7 +83,6 @@ class DocumentProcessor:
             api_key=Secret.from_env_var("QDRANT_API_KEY"),
             index=collection_name,
             embedding_dim=768,
-            recreate_index=not collection_exists,
         )
 
         if collection_exists:
@@ -98,7 +102,7 @@ class DocumentProcessor:
             ),
             ("text_converter", TextFileToDocument()),
             ("markdown_converter", MarkdownToDocument()),
-            ("pdf_converter", PyPDFToDocument()),
+            ("pdf_converter", PyMuPDFToDocument()),
             ("joiner", DocumentJoiner()),
             ("enricher", MetadataEnricher(metadata_dict=self.metadata_dict)),
             ("cleaner", DocumentCleaner()),
@@ -115,7 +119,7 @@ class DocumentProcessor:
                 SentenceTransformersDocumentEmbedder(
                     model=self.config.embedding_model,
                     device=get_device(),
-                    meta_fields_to_embed=["author", "title", "language"],
+                    meta_fields_to_embed=["title", "author", "link"],
                 ),
             ),
             ("writer", DocumentWriter(self.document_store)),
@@ -182,28 +186,132 @@ class DocumentProcessor:
         """Load the metadata information from meta.json"""
         metadata_path = self.config.tracking_dir / "meta.json"
         if metadata_path.exists():
-            with open(metadata_path, "r") as f:
+            with open(metadata_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         return {}
+
+    def process_json_files(self, directory: Path) -> Set[Path]:
+        """Process JSON files in the directory, extract articles to text files.
+
+        Returns a set of newly created text file paths.
+        """
+        json_files = list(directory.glob("*.json"))
+        if not json_files:
+            return set()
+
+        tracking_info = self._load_file_tracking()
+        metadata_dict = self._load_metadata()
+        new_text_files = set()
+
+        for json_file in json_files:
+            try:
+                print(f"Processing JSON file: {json_file}")
+                with open(json_file, "r", encoding="utf-8") as f:
+                    articles = json.load(f)
+
+                base_name = json_file.stem
+
+                for i, article in enumerate(articles):
+                    title = article.get("title", f"Article_{i}")
+                    link = article.get("link", "")
+                    full_text = article.get("full_text", "")
+
+                    if not full_text:
+                        print(
+                            f"Skipping article {i} in {json_file} - no full_text found"
+                        )
+                        continue
+
+                    safe_title = re.sub(r"[^\w\s]", "", title.lower())
+                    file_name = re.sub(r"\s+", "_", safe_title)
+
+                    file_name = f"{base_name}_{i}_{file_name[:50]}.txt"
+
+                    text_file_path = directory / file_name
+                    relative_path = str(text_file_path.relative_to(directory))
+
+                    if not text_file_path.exists():
+                        print(f"Creating new text file: {text_file_path}")
+                        with open(text_file_path, "w", encoding="utf-8") as f:
+                            f.write(full_text)
+                        new_text_files.add(text_file_path)
+                    else:
+                        print(f"Text file already exists: {text_file_path}")
+
+                        if relative_path not in tracking_info:
+                            new_text_files.add(text_file_path)
+
+                    if file_name not in metadata_dict:
+                        metadata_dict[file_name] = {
+                            "title": title,
+                            "link": link,
+                        }
+
+            except Exception as e:
+                import traceback
+
+                print(f"Error processing JSON file {json_file}: {e}")
+                print(traceback.format_exc())
+
+        if new_text_files:
+            self._save_metadata(metadata_dict)
+
+        return new_text_files
+
+    def _save_metadata(self, metadata_dict: dict) -> None:
+        """Save the metadata information to meta.json"""
+        metadata_path = self.config.tracking_dir / "meta.json"
+        with open(metadata_path, "w", encoding="utf-8") as f:
+            json.dump(metadata_dict, f, indent=4)
 
     def process_documents(self, directory: Path) -> bool:
         """Process documents in the directory.
 
         Returns True if any documents were processed."""
-        changed_files = self._get_changed_files(directory)
-
-        if not changed_files:
-            return False
-
-        self.pipeline.run({"router": {"sources": list(changed_files)}})
-
         tracking_info = self._load_file_tracking()
-        for file_path in changed_files:
-            relative_path = str(file_path.relative_to(directory))
-            tracking_info[relative_path] = self._calculate_file_hash(file_path)
+        files_to_process = set()
+        processed = False
 
-        self._save_file_tracking(tracking_info)
-        return True
+        new_text_files = self.process_json_files(directory)
+
+        all_files = {
+            f
+            for f in directory.glob("**/*")
+            if f.is_file() and not f.name.endswith(".json")
+        }
+
+        for file_path in all_files:
+            relative_path = str(file_path.relative_to(directory))
+
+            if relative_path not in tracking_info or tracking_info[
+                relative_path
+            ] != self._calculate_file_hash(file_path):
+                files_to_process.add(file_path)
+
+        files_to_process.update(new_text_files)
+
+        if files_to_process:
+            print(
+                f"Processing {len(files_to_process)} files: {[f.name for f in files_to_process]}"
+            )
+            try:
+                self.pipeline.run({"router": {"sources": list(files_to_process)}})
+
+                for file_path in files_to_process:
+                    relative_path = str(file_path.relative_to(directory))
+                    tracking_info[relative_path] = self._calculate_file_hash(file_path)
+
+                self._save_file_tracking(tracking_info)
+                processed = True
+            except Exception as e:
+                import traceback
+
+                print(f"Error processing files: {e}")
+                print(traceback.format_exc())
+        else:
+            print("No files need processing")
+
+        return processed
 
     @property
     def store(self):

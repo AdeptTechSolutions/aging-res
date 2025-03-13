@@ -16,8 +16,6 @@ def initialize_session():
     """Initialize session state variables"""
     if "initialized" not in st.session_state:
         st.session_state.initialized = False
-        st.session_state.unique_authors = []
-        st.session_state.unique_languages = []
         st.session_state.all_metadata = {}
 
         load_dotenv()
@@ -46,12 +44,6 @@ def initialize_session():
             with open(metadata_path, "r") as f:
                 metadata = json.load(f)
                 st.session_state.all_metadata = metadata
-                st.session_state.unique_authors = sorted(
-                    set(item["author"] for item in metadata.values())
-                )
-                st.session_state.unique_languages = sorted(
-                    set(item["language"] for item in metadata.values())
-                )
 
         st.session_state.initialized = True
         return documents_processed
@@ -101,45 +93,70 @@ def display_source_information(source, path_config):
 
         source_path = source["source"].replace("\\", "/")
         filename = source_path.split("/")[-1] if "/" in source_path else source_path
+        is_pdf = filename.lower().endswith(".pdf")
 
         metadata = st.session_state.all_metadata.get(filename, {})
         title = metadata.get("title", filename)
-        author = metadata.get("author", "Unknown")
-        language = metadata.get("language", "Unknown")
 
-        st.info(
-            f"""
-            **Title:** {title}  
-            **Author:** {author}  
-            **Language:** {language}  
-            **Page:** {source['page']}  
-            **Relevance Score:** {source['score']:.4f}
-            """
-        )
+        source_info = f"**Title:** {title}  \n"
+
+        if "author" in metadata:
+            source_info += f"**Author:** {metadata['author']}  \n"
+
+        if "link" in metadata:
+            source_info += f"**Source Link:** [View Original]({metadata['link']})  \n"
+
+        if is_pdf and source.get("page", 0) > 0:
+            source_info += f"**Page:** {source['page']}  \n"
+
+        source_info += f"**Relevance Score:** {source['score']:.4f}"
+
+        st.info(source_info)
 
         with st.expander("🔍 View Context", expanded=False):
             st.markdown(source["content"])
 
-            st.markdown("#### 📑 Page Preview")
-            pdf_path = path_config.data_dir / filename
+            if is_pdf and source.get("page", 0) > 0:
+                st.markdown("#### 📑 Page Preview")
+                pdf_path = path_config.data_dir / filename
 
-            col1, col2, col3 = st.columns([1, 1.5, 1])
-            with col2:
-                display_pdf_page(
-                    pdf_path,
-                    source["page"],
-                    path_config.temp_dir,
-                )
+                col1, col2, col3 = st.columns([1, 1.5, 1])
+                with col2:
+                    display_pdf_page(
+                        pdf_path,
+                        source["page"],
+                        path_config.temp_dir,
+                    )
 
-                download_link = get_pdf_download_link(filename)
-                st.markdown(f"📥  [Download Complete PDF]({download_link})")
+                    download_link = get_pdf_download_link(filename)
+                    st.markdown(f"📥  [Download Complete PDF]({download_link})")
     else:
         st.warning("⚠️ No source information available for this result.")
 
 
+def render_sidebar():
+    with st.sidebar:
+        st.markdown("### ℹ️ About")
+        st.markdown(
+            """
+            This application allows you to search through resources about aging, 
+            caregiving, and end-of-life care to receive relevant information.
+            
+            Simply enter your question and use the `🔍 Search` button
+            to get answers based on trusted resources.
+            """
+        )
+
+        st.markdown("---")
+        st.markdown("#### Resources include:")
+        st.markdown("- Books on aging and caregiving")
+        st.markdown("- Articles from reputable sources")
+        st.markdown("- Practical guides and advice")
+
+
 def main():
     st.set_page_config(
-        page_title="Aging RAG",
+        page_title="Aging & Caregiving Resources",
         page_icon="🔍",
         layout="wide",
         initial_sidebar_state="expanded",
@@ -150,91 +167,34 @@ def main():
         st.warning("Initializing application...")
         st.stop()
 
-    col1, col2, col3 = st.columns([1, 0.4, 1])
+    col1, col2, col3 = st.columns([1, 0.7, 1])
     with col2:
-        logo = Image.open("resources/logo.png")
+        logo = Image.open("resources/logo.jpg")
         st.image(logo, use_container_width=True)
 
-    with st.sidebar:
-        st.markdown("## 📚 Filters")
+    render_sidebar()
 
-        selected_authors = st.multiselect(
-            "Select authors:",
-            options=st.session_state.unique_authors,
-            key="author_filter",
-            help="Filter results by specific authors.",
-        )
-
-        if not selected_authors:
-            st.warning("Note: All sources would be used if no author is selected")
-
-        selected_languages = st.multiselect(
-            "Select languages:",
-            options=st.session_state.unique_languages,
-            key="language_filter",
-            help="Filter results by languages.",
-            default=["English"],
-        )
-
-        # if docs_processed:
-        #     st.success("New or modified documents have been processed!")
-        # else:
-        #     st.info("No document changes detected.")
-
-        st.markdown("### ℹ️ About")
-        st.markdown(
-            """
-            This application allows you to search through Islamic texts 
-            and receive relevant information from verified sources.
-            
-            Simply enter your question and use the `🔍 Search` button
-            to get answers. You can also filter the results by authors and languages.
-            """
-        )
-
+    st.markdown(
+        """
+    Ask questions about aging, caregiving, end-of-life planning, or related topics.
+    Our system will provide answers based on trusted resources, books, and articles.
+    """
+    )
     st.markdown("")
 
     with st.form("query_form"):
         query = st.text_input(
             "Enter your question:",
-            placeholder="Ask a question about the Islamic texts...",
+            placeholder="Ask a question about aging, caregiving, or end-of-life care...",
         )
         submit_button = st.form_submit_button("🔍 Search")
 
     if submit_button and query:
-        with st.spinner("Searching through texts..."):
-            filters = []
-            if selected_authors:
-                filters.append(
-                    {
-                        "field": "meta.author",
-                        "operator": "in",
-                        "value": selected_authors,
-                    }
-                )
-            if selected_languages:
-                filters.append(
-                    {
-                        "field": "meta.language",
-                        "operator": "in",
-                        "value": selected_languages,
-                    }
-                )
-
-            combined_filters = None
-            if filters:
-                if len(filters) > 1:
-                    combined_filters = {
-                        "operator": "AND",
-                        "conditions": filters,
-                    }
-                else:
-                    combined_filters = filters[0]
-
+        with st.spinner("Searching through resources..."):
             query_engine = QueryEngine(
                 st.session_state.processor.store, st.session_state.doc_config
             )
-            results = query_engine.query(query, combined_filters)
+            results = query_engine.query(query, None)
 
             st.markdown("#### 📝 Answer")
             st.write(results["answer"])
