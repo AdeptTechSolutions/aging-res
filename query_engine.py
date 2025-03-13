@@ -41,7 +41,6 @@ class QueryEngine:
         - Do not use information outside of the provided documents.
         - If no relevant information is found, state that directly.
         - When referencing specific texts, include the title and source.
-        - Always cite your sources clearly, specifying which document each piece of information comes from.
         - Be empathetic and compassionate when discussing sensitive topics.
         - Focus on practical, actionable advice that caregivers and aging individuals can implement.
 
@@ -85,6 +84,9 @@ class QueryEngine:
                 GoogleAIGeminiGenerator(
                     model="gemini-2.0-flash",
                     api_key=Secret.from_env_var("GEMINI_API_KEY"),
+                    generation_config={
+                        "temperature": 0.2,
+                    },
                 ),
             ),
             ("answer_builder", AnswerBuilder()),
