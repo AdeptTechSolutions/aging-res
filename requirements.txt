@@ -1,0 +1,16 @@
+haystack-ai
+google-ai-haystack
+qdrant-haystack
+docling-haystack
+sentence-transformers>=3.0.0 
+huggingface_hub>=0.23.0
+markdown-it-py 
+mdit_plain 
+pypdf
+transformers[torch,sentencepiece]
+python-dotenv
+pymupdf
+pdfminer.six
+streamlit
+trulens
+trulens-providers-openai

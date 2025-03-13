@@ -1,0 +1,2 @@
+app_name,app_version,Answer Relevance,Context Relevance,Groundedness,latency,total_cost
+Islamic_Texts_QA,haystack,1.0,1.0,1.0,9.0606282,0.00056403
