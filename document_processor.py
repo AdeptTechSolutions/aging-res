@@ -67,7 +67,7 @@ class DocumentProcessor:
         """Initialize QdrantDocumentStore with proper collection handling."""
         qdrant_url = os.getenv("QDRANT_URL")
         api_key = os.getenv("QDRANT_API_KEY")
-        collection_name = "islamic_texts"
+        collection_name = "aging_res"
 
         client = QdrantClient(url=qdrant_url, api_key=api_key)
         collections = client.get_collections().collections

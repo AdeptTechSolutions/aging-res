@@ -12,5 +12,3 @@ python-dotenv
 pymupdf
 pdfminer.six
 streamlit
-trulens
-trulens-providers-openai

@@ -139,7 +139,7 @@ def display_source_information(source, path_config):
 
 def main():
     st.set_page_config(
-        page_title="Islamic RAG",
+        page_title="Aging RAG",
         page_icon="🔍",
         layout="wide",
         initial_sidebar_state="expanded",
