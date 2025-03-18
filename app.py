@@ -136,27 +136,41 @@ def display_source_information(source, path_config):
 
 def render_sidebar():
     with st.sidebar:
-        st.markdown("### ℹ️ About")
+        col1, col2, col3 = st.columns([0.3, 2, 0.3])
+        with col2:
+            st.image("resources/logo.png", use_container_width=True)
+
         st.markdown(
-            """
-            This application allows you to search through resources about aging, 
-            caregiving, and end-of-life care to receive relevant information.
-            
-            Simply enter your question and use the `🔍 Search` button
-            to get answers based on trusted resources.
-            """
+            "<h3 style='text-align: center;'>Eldercare is chaos.<br>We make it easier.</h3>",
+            unsafe_allow_html=True,
         )
 
         st.markdown("---")
+        st.markdown("### ℹ️ About")
+        st.markdown(
+            """
+            Welcome to Caregiver Basecamp—your guide for surviving the wilds of eldercare. 
+            
+            Caring for aging parents feels like trekking through unknown terrain with a faulty map. 
+            We've got your back. Just type your question, hit search, and get straight-up answers 
+            from trusted sources—no fluff, no detours, just the essentials to keep you on course.
+            """
+        )
+
         st.markdown("#### Resources include:")
-        st.markdown("- Books on aging and caregiving")
-        st.markdown("- Articles from reputable sources")
-        st.markdown("- Practical guides and advice")
+        st.markdown(
+            """
+        - Articles from the most trusted sources
+        - Insights from authority websites
+        - Best selling books on aging and caregiving
+        - Practical guides and advice from experts
+        """
+        )
 
 
 def main():
     st.set_page_config(
-        page_title="Aging & Caregiving Resources",
+        page_title="Eldercare Hero Basecamp",
         page_icon="🔍",
         layout="wide",
         initial_sidebar_state="expanded",
@@ -167,25 +181,29 @@ def main():
         st.warning("Initializing application...")
         st.stop()
 
-    col1, col2, col3 = st.columns([1, 0.7, 1])
+    col1, col2, col3 = st.columns([0.825, 2, 0.825])
     with col2:
-        logo = Image.open("resources/logo.jpg")
-        st.image(logo, use_container_width=True)
+        right_image = Image.open("resources/right_up.png")
+        st.image(right_image, use_container_width=True)
 
     render_sidebar()
 
     st.markdown(
         """
-    Ask questions about aging, caregiving, end-of-life planning, or related topics.
-    Our system will provide answers based on trusted resources, books, and articles.
-    """
+        <div style="text-align: center;">
+        Simplifying caregiving with real-time guidance & support.<br>
+        What's weighing on you? Need to vent or find guidance?<br>
+        Ask your question, and we'll deliver reliable answers from trusted sources. Caregiving is tough—we've got your back.
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
     st.markdown("")
 
     with st.form("query_form"):
         query = st.text_input(
-            "Enter your question:",
-            placeholder="Ask a question about aging, caregiving, or end-of-life care...",
+            "What's on your mind?",
+            placeholder="Need to vent? Wondering how to navigate Medicare? Need meal planning tips?",
         )
         submit_button = st.form_submit_button("🔍 Search")
 
