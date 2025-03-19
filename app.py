@@ -184,7 +184,7 @@ def main():
     col1, col2, col3 = st.columns([0.825, 0.8, 0.825])
     with col2:
         right_image = Image.open("resources/header_image_updated.png")
-        st.image(right_image, width=400)
+        st.image(right_image, use_container_width=True)
 
     render_sidebar()
 
