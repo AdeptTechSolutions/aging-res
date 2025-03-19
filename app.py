@@ -181,7 +181,7 @@ def main():
         st.warning("Initializing application...")
         st.stop()
 
-    col1, col2, col3 = st.columns([0.825, 1.6, 0.825])
+    col1, col2, col3 = st.columns([0.825, 1.4, 0.825])
     with col2:
         right_image = Image.open("resources/header_image_updated.png")
         st.image(right_image, width=400)
