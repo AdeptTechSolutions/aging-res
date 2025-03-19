@@ -183,16 +183,8 @@ def main():
 
     col1, col2, col3 = st.columns([0.825, 2, 0.825])
     with col2:
-        st.markdown(
-        '<div style="text-align: center;">',
-        unsafe_allow_html=True,
-        )
         right_image = Image.open("resources/header_image_updated.png")
         st.image(right_image, width=400)
-        st.markdown(
-        '</div>',
-        unsafe_allow_html=True,
-        )
 
     render_sidebar()
 
