@@ -183,7 +183,7 @@ def main():
 
     col1, col2, col3 = st.columns([0.825, 2, 0.825])
     with col2:
-        right_image = Image.open("resources/right_up.png")
+        right_image = Image.open("resources/header_image_updated.png")
         st.image(right_image, use_container_width=True)
 
     render_sidebar()
