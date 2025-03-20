@@ -141,30 +141,40 @@ def render_sidebar():
             st.image("resources/logo.png", use_container_width=True)
 
         st.markdown(
-            "<h3 style='text-align: center;'>Eldercare is chaos.<br>We make it easier.</h3>",
+            "<h3 style='text-align: center; font-family: Open Sans, sans-serif; font-weight: 700;'>Eldercare is chaos.<br>We make it easier.</h3>",
             unsafe_allow_html=True,
         )
 
         st.markdown("---")
-        st.markdown("### ℹ️ About")
+        st.markdown(
+            "<div class='sidebar-heading'>ℹ️ About</div>", unsafe_allow_html=True
+        )
         st.markdown(
             """
-            Welcome to Caregiver Basecamp—your guide for surviving the wilds of eldercare. 
-            
+            <div class='sidebar-text'>
+            Welcome to Caregiver Basecamp—your guide for surviving the wilds of eldercare.<br><br>
             Caring for aging parents feels like trekking through unknown terrain with a faulty map. 
             We've got your back. Just type your question, hit search, and get straight-up answers 
             from trusted sources—no fluff, no detours, just the essentials to keep you on course.
-            """
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-        st.markdown("#### Resources include:")
+        st.markdown(
+            "<div class='sidebar-subheading'>Resources include:</div>",
+            unsafe_allow_html=True,
+        )
         st.markdown(
             """
-        - Articles from the most trusted sources
-        - Insights from authority websites
-        - Best selling books on aging and caregiving
-        - Practical guides and advice from experts
-        """
+            <ul class='sidebar-list'>
+                <li>Articles from the most trusted sources</li>
+                <li>Insights from authority websites</li>
+                <li>Best selling books on aging and caregiving</li>
+                <li>Practical guides and advice from experts</li>
+            </ul>
+            """,
+            unsafe_allow_html=True,
         )
 
 
@@ -175,25 +185,152 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded",
     )
+
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        
+        .block-container {
+            padding-top: 2.5rem;
+            padding-bottom: 0rem;
+        }
+        
+        div.stImage {
+            margin-top: 10px;
+        }
+        
+        /* Main content styling */
+        .main-heading {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 1.3;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #494a4c;
+        }
+        
+        .sub-heading-bold {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #494a4c;
+        }
+        
+        .normal-text {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #494a4c;
+        }
+        
+        .closing-bold {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #494a4c;
+        }
+        
+        /* Sidebar styling */
+        .sidebar-heading {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #494a4c;
+        }
+        
+        .sidebar-subheading {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #494a4c;
+        }
+        
+        .sidebar-text {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+            line-height: 1.5;
+            font-size: 0.975rem;
+            color: #494a4c;
+        }
+        
+        .sidebar-list {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+            margin-left: 20px;
+            padding-left: 0;
+            font-size: 0.975rem;
+            color: #494a4c;
+        }
+        
+        .sidebar .stMarkdown h3 {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            text-align: center;
+            color: #494a4c;
+        }
+        
+        .sidebar .stMarkdown p, .sidebar .stMarkdown li {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 400;
+            color: #494a4c;
+        }
+        
+        .sidebar .stMarkdown h4 {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            margin-top: 20px;
+            color: #494a4c;
+        }
+        
+        /* Apply Open Sans to all text in the app */
+        html, body, [class*="css"] {
+            font-family: 'Open Sans', sans-serif;
+            color: #494a4c;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
     docs_processed = initialize_session()
 
     if not st.session_state.initialized:
         st.warning("Initializing application...")
         st.stop()
 
-    col1, col2, col3 = st.columns([0.825, 0.825, 0.825])
+    col1, col2, col3 = st.columns([1, 0.5, 1])
     with col2:
-        right_image = Image.open("resources/header_image_updated.png")
+        right_image = Image.open("resources/header_image.png")
         st.image(right_image, use_container_width=True)
 
     render_sidebar()
 
     st.markdown(
         """
-        <div style="text-align: center;">
-        Simplifying caregiving with real-time guidance & support.<br>
-        What's weighing on you? Need to vent or find guidance?<br>
-        Ask your question, and we'll deliver reliable answers from trusted sources. Caregiving is tough—we've got your back.
+        <div>
+            <div class="main-heading">
+                Simplifying caregiving with<br>real-time guidance & support
+            </div>
+            <div class="sub-heading-bold">
+                Need to find guidance, a resource or just vent?
+            </div>
+            <div class="normal-text">
+                Ask your question, and we'll deliver reliable answers from<br>trusted sources in eldercare.
+            </div>
+            <div class="closing-bold">
+                Caregiving is tough—we've got your back.
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
