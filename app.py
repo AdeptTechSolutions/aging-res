@@ -258,18 +258,18 @@ def main():
         
         .sidebar-text {
             font-family: 'Open Sans', sans-serif;
-            font-weight: 400;
+            font-weight: 520;
             line-height: 1.5;
-            font-size: 0.975rem;
+            font-size: 0.95rem;
             color: #494a4c;
         }
         
         .sidebar-list {
             font-family: 'Open Sans', sans-serif;
-            font-weight: 400;
+            font-weight: 520;
             margin-left: 20px;
             padding-left: 0;
-            font-size: 0.975rem;
+            font-size: 0.95rem;
             color: #494a4c;
         }
         
