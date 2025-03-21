@@ -194,6 +194,15 @@ def main():
         .block-container {
             padding-top: 2.5rem;
             padding-bottom: 0rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            overflow-x: hidden;
+        }
+        
+        /* Prevent horizontal scrolling */
+        .main .block-container {
+            overflow-x: hidden;
         }
         
         div.stImage {
@@ -352,7 +361,7 @@ def main():
             results = query_engine.query(query, None)
 
             st.markdown("#### 📝 Answer")
-            st.write(results["answer"])
+            st.markdown(results["answer"])
 
             st.markdown("#### 📚 Sources")
 

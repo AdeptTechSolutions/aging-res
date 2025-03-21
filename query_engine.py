@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 from typing import Any, Dict
 
@@ -34,15 +35,16 @@ class QueryEngine:
         You are an expert in aging, caregiving, and end-of-life care. You provide informative answers based on the following context.
 
         Instructions:
-        - Answer the question using the information available in the provided documents.
+        - Format your entire answer in clear paragraphs. Do not use bullet points, lists, or multiple headings.
+        - Answer the question using the information available in the provided documents when relevant.
+        - If the documents don't contain relevant information but you can answer based on general knowledge (e.g., meal planning, general healthcare advice), feel free to provide a helpful response using your own knowledge.
         - Explore different perspectives or approaches when present in the source materials.
         - Include specific quotations from the texts when directly relevant to the question.
         - Explain specialized terminology or concepts that may be unfamiliar to general readers.
-        - Do not use information outside of the provided documents.
-        - If no relevant information is found, state that directly.
         - When referencing specific texts, include the title and source.
         - Be empathetic and compassionate when discussing sensitive topics.
         - Focus on practical, actionable advice that caregivers and aging individuals can implement.
+        - End your response with encouraging words or a supportive message for the caregiver.
 
         Documents:
         {% for doc in documents %}
@@ -55,7 +57,8 @@ class QueryEngine:
 
         Question: {{query}}
 
-        Answer:
+        Answer (enclosed in triple backticks):
+        ```<answer goes here>```
         """
 
         components = [
@@ -133,7 +136,7 @@ class QueryEngine:
         contexts = result["ranker"]["documents"]
 
         if not contexts:
-            return {"answer": "No relevant information found.", "sources": []}
+            return {"answer": answer, "sources": []}
         else:
             source_infos = [
                 self._process_context(context)
