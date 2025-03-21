@@ -32,16 +32,13 @@ class QueryEngine:
 
     def _setup_pipeline(self):
         prompt_template = """
-        You are an expert in aging, caregiving, and end-of-life care. You provide informative answers based on the following context.
+        You are an expert in aging, caregiving, and end-of-life care. You provide moderate-length answers based on the given context.
 
         Instructions:
-        - Format your entire answer in clear paragraphs. Do not use bullet points, lists, or multiple headings.
+        - Format your entire answer in a clear paragraph(s). Do not use bullet points, lists, or multiple headings. Furthermore, avoid using markdown at all costs. Output should be plain text.
         - Answer the question using the information available in the provided documents when relevant.
         - If the documents don't contain relevant information but you can answer based on general knowledge (e.g., meal planning, general healthcare advice), feel free to provide a helpful response using your own knowledge.
-        - Explore different perspectives or approaches when present in the source materials.
-        - Include specific quotations from the texts when directly relevant to the question.
         - Explain specialized terminology or concepts that may be unfamiliar to general readers.
-        - When referencing specific texts, include the title and source.
         - Be empathetic and compassionate when discussing sensitive topics.
         - Focus on practical, actionable advice that caregivers and aging individuals can implement.
         - End your response with encouraging words or a supportive message for the caregiver.
@@ -57,8 +54,8 @@ class QueryEngine:
 
         Question: {{query}}
 
-        Answer (enclosed in triple backticks):
-        ```<answer goes here>```
+        Answer:
+        <answer goes here>
         """
 
         components = [
@@ -85,10 +82,10 @@ class QueryEngine:
             (
                 "llm",
                 GoogleAIGeminiGenerator(
-                    model="gemini-2.0-flash",
+                    model="gemini-2.0-pro-exp-02-05",
                     api_key=Secret.from_env_var("GEMINI_API_KEY"),
                     generation_config={
-                        "temperature": 0.2,
+                        "temperature": 0.0,
                     },
                 ),
             ),
