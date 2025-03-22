@@ -346,12 +346,19 @@ def main():
     )
     st.markdown("")
 
+    # with st.form("query_form"):
+    #     query = st.text_input(
+    #         "What's on your mind?",
+    #         placeholder="Need to vent? Wondering how to navigate Medicare? Need meal planning tips?",
+    #     )
+    #     submit_button = st.form_submit_button("🔍 Search")
     with st.form("query_form"):
-        query = st.text_input(
-            "What's on your mind?",
-            placeholder="Need to vent? Wondering how to navigate Medicare? Need meal planning tips?",
-        )
-        submit_button = st.form_submit_button("🔍 Search")
+    query = st.text_area(
+        "What's on your mind?",
+        placeholder="Need to vent? Wondering how to navigate Medicare? Need meal planning tips?",
+        height=100  # Adjust height as needed
+    )
+    submit_button = st.form_submit_button("🔍 Search")
 
     if submit_button and query:
         with st.spinner("Searching through resources..."):
