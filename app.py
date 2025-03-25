@@ -346,19 +346,18 @@ def main():
     )
     st.markdown("")
 
-    # with st.form("query_form"):
-    #     query = st.text_input(
-    #         "What's on your mind?",
-    #         placeholder="Need to vent? Wondering how to navigate Medicare? Need meal planning tips?",
-    #     )
-    #     submit_button = st.form_submit_button("🔍 Search")
     with st.form("query_form"):
         query = st.text_area(
             "What's on your mind?",
             placeholder="Need to vent? Wondering how to navigate Medicare? Need meal planning tips?",
             height=100  # Adjust height as needed
         )
-        submit_button = st.form_submit_button("🔍 Search")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            submit_button = st.form_submit_button("🔍 Search")
+        with col2:
+            feedback_url = "https://pamela988959.typeform.com/to/mqVIFBr6"
+            st.markdown(f'<a href="{feedback_url}" target="_blank"><button style="width:100%;padding:10px;background-color:#FF4B4B;color:white;border:none;border-radius:4px;cursor:pointer;">💭 Give Feedback</button></a>', unsafe_allow_html=True)
 
     if submit_button and query:
         with st.spinner("Searching through resources..."):
