@@ -97,7 +97,7 @@ Answer:
             (
                 "llm",
                 GoogleAIGeminiGenerator(
-                    model="gemini-2.0-pro-exp-02-05",
+                    model="gemini-2.5-flash-preview-04-17",
                     api_key=Secret.from_env_var("GEMINI_API_KEY"),
                     generation_config={
                         "temperature": 0.0,
