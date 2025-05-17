@@ -1,3 +1,9 @@
 [theme]
 base="light"
 primaryColor="#b38837"
+
+[server]
+enableStaticServing = true
+
+[runner]
+moduleExcludedFromWatching = ["torch"]
