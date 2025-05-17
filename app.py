@@ -81,7 +81,7 @@ def get_pdf_download_link(filename: str) -> str:
     Args:
         filename: Just the filename without path prefixes
     """
-    base_url = "https://raw.githubusercontent.com/AdeptTechSolutions/haystack-rag/refs/heads/main/data/"
+    base_url = "https://raw.githubusercontent.com/AdeptTechSolutions/aging-res/refs/heads/main/data/"
     clean_filename = filename.split("/")[-1] if "/" in filename else filename
     return f"{base_url}{clean_filename}"
 
